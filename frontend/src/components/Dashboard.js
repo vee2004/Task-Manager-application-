@@ -3,12 +3,14 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import useDebounce from '../hooks/useDebounce';
 import { elasticSearch } from '../utils/elasticSearch';
+import { setupTaskAutomation, checkTasksAndNotify } from '../services/taskMailAutomation';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TaskFilter from './TaskFilter';
 import Modal from './Modal';
 import Button from './Button';
 import SessionInfo from './SessionInfo';
+import NotificationHistory from './NotificationHistory';
 
 // API base URL
 const API_URL = 'http://localhost:5000/api/tasks';
@@ -36,6 +38,11 @@ const Dashboard = () => {
   });
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Notification history state
+  const [showNotificationHistory, setShowNotificationHistory] = useState(false);
+  const [automationEnabled, setAutomationEnabled] = useState(true);
+  const [nextAutomationRun, setNextAutomationRun] = useState(null);
+  
   /**
    * Use custom debounce hook to optimize search performance
    * Delays search execution by 300ms after user stops typing
@@ -61,11 +68,33 @@ const Dashboard = () => {
   };
 
   /**
-   * Load tasks on component mount
+   * Load tasks on component mount and setup task automation
    */
   useEffect(() => {
     fetchTasks();
-  }, []);
+    
+    // Setup task mail automation (runs every 20 minutes)
+    if (automationEnabled) {
+      console.log('🤖 Initializing Task Mail Automation...');
+      const cleanup = setupTaskAutomation(() => tasks, 20);
+      
+      // Calculate next run time
+      const nextRun = new Date(Date.now() + 20 * 60 * 1000);
+      setNextAutomationRun(nextRun);
+      
+      // Update next run time every minute
+      const timerInterval = setInterval(() => {
+        const nextRun = new Date(Date.now() + 20 * 60 * 1000);
+        setNextAutomationRun(nextRun);
+      }, 60 * 1000);
+      
+      // Cleanup on unmount
+      return () => {
+        cleanup();
+        clearInterval(timerInterval);
+      };
+    }
+  }, [automationEnabled]);
 
   /**
    * Apply filters and search to tasks using Elasticsearch-style search
@@ -225,6 +254,32 @@ const Dashboard = () => {
     logout();
   };
 
+  /**
+   * Manually trigger task automation check
+   */
+  const handleManualAutomationRun = async () => {
+    if (tasks.length === 0) {
+      alert('No tasks available to check!');
+      return;
+    }
+    
+    console.log('🔘 Manual automation triggered by user');
+    await checkTasksAndNotify(tasks, user?.email || 'demo@taskmanager.com');
+    alert('✅ Automation check complete! Check console for details.');
+  };
+
+  /**
+   * Toggle automation on/off
+   */
+  const handleToggleAutomation = () => {
+    setAutomationEnabled(!automationEnabled);
+    if (!automationEnabled) {
+      alert('✅ Task Mail Automation Enabled! Checks will run every 20 minutes.');
+    } else {
+      alert('⏸️ Task Mail Automation Paused.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header with Logout */}
@@ -239,12 +294,39 @@ const Dashboard = () => {
               <p className="text-gray-600 mt-1">Welcome, {user?.name || user?.email}!</p>
             </div>
             
-            {/* User Info & Logout */}
-            <div className="flex items-center gap-4">
+            {/* User Info & Automation Controls */}
+            <div className="flex items-center gap-3">
+              {/* Automation Status Indicator */}
+              <div className="hidden lg:flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${automationEnabled ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+                  <span className="text-xs text-gray-600">
+                    {automationEnabled ? '🤖 Automation Active' : '⏸️ Automation Paused'}
+                  </span>
+                </div>
+                {automationEnabled && nextAutomationRun && (
+                  <span className="text-xs text-gray-500 border-l border-gray-300 pl-2">
+                    Next: {new Date(nextAutomationRun).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+
+              {/* Notification History Button */}
+              <button
+                onClick={() => setShowNotificationHistory(true)}
+                className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors relative"
+                title="View Notification History"
+              >
+                <span className="text-xl">📧</span>
+              </button>
+
+              {/* User Info */}
               <div className="text-right hidden md:block">
                 <p className="text-sm text-gray-600">Logged in as</p>
                 <p className="text-sm font-semibold text-gray-800">{user?.email}</p>
               </div>
+
+              {/* Logout Button */}
               <Button
                 variant="danger"
                 size="md"
@@ -256,6 +338,62 @@ const Dashboard = () => {
           </div>
         </div>
       </header>
+
+      {/* Automation Control Panel */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🤖</span>
+              <div>
+                <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                  Task Mail Automation
+                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                    automationEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {automationEnabled ? '● ACTIVE' : '○ PAUSED'}
+                  </span>
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {automationEnabled ? (
+                    <>
+                      🔄 Checks pending tasks every 20 minutes • 
+                      Next run: <span className="font-semibold">{nextAutomationRun ? new Date(nextAutomationRun).toLocaleTimeString() : 'Calculating...'}</span>
+                    </>
+                  ) : (
+                    '⏸️ Automation is currently paused. Enable to receive task notifications.'
+                  )}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleManualAutomationRun}
+                disabled={tasks.length === 0}
+              >
+                ⚡ Run Now
+              </Button>
+              <Button
+                variant={automationEnabled ? "danger" : "primary"}
+                size="sm"
+                onClick={handleToggleAutomation}
+              >
+                {automationEnabled ? '⏸️ Pause' : '▶️ Enable'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowNotificationHistory(true)}
+              >
+                📧 History
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -334,6 +472,12 @@ const Dashboard = () => {
           <p>© 2025 Task Manager | Built with React & MongoDB</p>
         </div>
       </footer>
+
+      {/* Notification History Modal */}
+      <NotificationHistory
+        isOpen={showNotificationHistory}
+        onClose={() => setShowNotificationHistory(false)}
+      />
 
       {/* Session Information Component */}
       <SessionInfo />

@@ -25,6 +25,18 @@ A full-stack Task Manager application built with React, Node.js, Express, and Mo
   - Fuzzy matching support (typo tolerance)
   - 300ms debouncing (96% reduction in operations)
   - Visual "Searching..." feedback
+- ✅ **Task Mail Automation**
+  - **Automated cron job** (runs every 20 minutes)
+  - **Overdue task notifications** (red theme, high priority)
+  - **Due soon alerts** (tasks due within 24 hours)
+  - **High priority reminders** (limited to 3 per run)
+  - **Mock email system** (HTML templates with 100-500ms delivery)
+  - **Notification history** (tracks last 100 emails)
+  - **Manual trigger** (run automation on-demand)
+  - **Pause/Resume control** (enable/disable automation)
+  - **Real-time status widget** (shows next run time)
+  - **Email preview** (view sent notification content)
+  - **Console logging** (detailed automation reports)
 - ✅ Create tasks with title, description, priority, and due date
 - ✅ View all tasks with detailed information
 - ✅ Edit existing tasks
@@ -124,6 +136,7 @@ TaskManager/
 │   │   │   ├── Dashboard.js
 │   │   │   ├── ProtectedRoute.js
 │   │   │   ├── SessionInfo.js
+│   │   │   ├── NotificationHistory.js
 │   │   │   ├── TaskForm.js
 │   │   │   ├── TaskList.js
 │   │   │   ├── TaskFilter.js
@@ -132,6 +145,8 @@ TaskManager/
 │   │   │   └── AuthContext.js
 │   │   ├── hooks/
 │   │   │   └── useDebounce.js
+│   │   ├── services/
+│   │   │   └── taskMailAutomation.js
 │   │   ├── utils/
 │   │   │   └── elasticSearch.js
 │   │   ├── App.js
@@ -145,6 +160,7 @@ TaskManager/
 ├── ELASTICSEARCH_FLOW_GUIDE.md
 ├── SESSION_MANAGEMENT_GUIDE.md
 ├── SESSION_MANAGEMENT_QUICK_REFERENCE.md
+├── TASK_MAIL_AUTOMATION_GUIDE.md
 ├── LOGIN_AUTHENTICATION_GUIDE.md
 └── LOGIN_QUICK_REFERENCE.md
 ```
@@ -168,6 +184,12 @@ TaskManager/
    - Search is **debounced** (300ms delay) for optimal performance
    - Visual "🔍 Searching..." indicator shows while typing
    - Case-insensitive matching
+7. **Task Automation**: Monitor and control automated email notifications
+   - View automation status in the control panel
+   - Click **"⚡ Run Now"** to trigger manual check
+   - Click **"⏸️ Pause"** or **"▶️ Enable"** to control automation
+   - Click **"📧 History"** to view sent notifications
+   - Check console for detailed automation logs every 20 minutes
 
 ## 📚 Documentation
 
@@ -176,6 +198,9 @@ TaskManager/
 - **[Session Management Quick Reference](SESSION_MANAGEMENT_QUICK_REFERENCE.md)** - Quick session reference
 - **[Login Authentication Guide](LOGIN_AUTHENTICATION_GUIDE.md)** - Complete authentication docs
 - **[Login Quick Reference](LOGIN_QUICK_REFERENCE.md)** - Quick login reference
+
+### Automation & Notifications
+- **[Task Mail Automation Guide](TASK_MAIL_AUTOMATION_GUIDE.md)** - Complete automation docs with cron jobs, email templates, and notification system
 
 ### Search & Performance
 - **[Elasticsearch Flow Guide](ELASTICSEARCH_FLOW_GUIDE.md)** - Elasticsearch-style search implementation
@@ -208,6 +233,44 @@ TaskManager/
 - Efficient filtering algorithms
 - Optimized re-rendering
 - Console logging for debugging
+
+### 📧 Task Mail Automation
+- **20-minute interval**: Automated cron-like checks
+- **Three notification types**: Overdue (red), Due Soon (yellow), High Priority (red)
+- **Smart detection**: Automatically finds tasks needing attention
+- **Mock email system**: HTML templates with simulated delivery
+- **Notification history**: Tracks last 100 sent emails
+- **Manual controls**: Run Now, Pause/Enable, View History
+- **Real-time status**: Next run countdown in UI
+- **Console reports**: Detailed logs every 20 minutes
+
+## 🎮 Quick Start Guide
+
+1. **Start Backend**: `cd backend && npm run dev` (Port 5000)
+2. **Start Frontend**: `cd frontend && npm start` (Port 3000)
+3. **Login**: Use demo credentials from login screen
+4. **Create Tasks**: Add tasks with titles, descriptions, priorities, and due dates
+5. **Watch Automation**: Check console every 20 minutes for email notifications
+6. **View History**: Click "📧 History" button to see all sent notifications
+
+## 🧪 Testing Automation
+
+```bash
+# Create test tasks:
+- Overdue task: Set due date in the past
+- Due soon task: Set due date within next 24 hours  
+- High priority task: Mark priority as "High"
+
+# Trigger automation:
+- Click "⚡ Run Now" button
+- Wait 20 minutes for automatic check
+- Check browser console for detailed logs
+
+# View results:
+- Click "📧 History" to see all notifications
+- Filter by type (All, Overdue, Due Soon, High Priority)
+- Click notification to preview email content
+```
 
 ## License
 
