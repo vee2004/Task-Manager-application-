@@ -4,23 +4,33 @@ A full-stack Task Manager application built with React, Node.js, Express, and Mo
 
 ## Features
 
-- ✅ **Authentication System**
-  - Login screen with email/password
-  - Session storage for maintaining login state
+- ✅ **Advanced Authentication & Session Management**
+  - Login screen with email/password validation
+  - **sessionStorage** (persists until tab closes)
+  - **JWT token simulation** (industry-standard format)
+  - **Auto-expiry** after 30 minutes of inactivity
+  - **Activity tracking** (extends session on interaction)
+  - **Session warnings** (5-minute alert before expiry)
+  - **Session info widget** (real-time countdown)
+  - **One-click session extension**
   - Protected routes (dashboard requires authentication)
-  - Logout functionality
+  - Secure logout with cleanup
   - Auto-redirect after login
+- ✅ **Elasticsearch-Style Search**
+  - Partial substring matching ("meet" finds "meeting")
+  - Case-insensitive comparison
+  - Multi-field search (title + description)
+  - Relevance scoring (ranks best matches first)
+  - Search highlighting
+  - Fuzzy matching support (typo tolerance)
+  - 300ms debouncing (96% reduction in operations)
+  - Visual "Searching..." feedback
 - ✅ Create tasks with title, description, priority, and due date
 - ✅ View all tasks with detailed information
 - ✅ Edit existing tasks
 - ✅ Delete tasks with confirmation
 - ✅ Mark tasks as complete/pending
 - ✅ Filter tasks by priority and status
-- ✅ **Optimized Search** with custom debouncing (300ms delay)
-  - Case-insensitive search across title and description
-  - 96% reduction in re-renders
-  - Visual "Searching..." feedback
-  - Smooth typing experience
 - ✅ Sort tasks by various criteria
 - ✅ Responsive UI with Tailwind CSS
 
@@ -113,6 +123,7 @@ TaskManager/
 │   │   │   ├── Login.js
 │   │   │   ├── Dashboard.js
 │   │   │   ├── ProtectedRoute.js
+│   │   │   ├── SessionInfo.js
 │   │   │   ├── TaskForm.js
 │   │   │   ├── TaskList.js
 │   │   │   ├── TaskFilter.js
@@ -121,6 +132,8 @@ TaskManager/
 │   │   │   └── AuthContext.js
 │   │   ├── hooks/
 │   │   │   └── useDebounce.js
+│   │   ├── utils/
+│   │   │   └── elasticSearch.js
 │   │   ├── App.js
 │   │   ├── index.js
 │   │   └── index.css
@@ -128,6 +141,10 @@ TaskManager/
 ├── README.md
 ├── DEBOUNCING_GUIDE.md
 ├── DEBOUNCING_QUICK_REFERENCE.md
+├── DEBOUNCING_VISUAL_DEMO.md
+├── ELASTICSEARCH_FLOW_GUIDE.md
+├── SESSION_MANAGEMENT_GUIDE.md
+├── SESSION_MANAGEMENT_QUICK_REFERENCE.md
 ├── LOGIN_AUTHENTICATION_GUIDE.md
 └── LOGIN_QUICK_REFERENCE.md
 ```
@@ -154,10 +171,43 @@ TaskManager/
 
 ## 📚 Documentation
 
-- **[Debouncing Guide](DEBOUNCING_GUIDE.md)** - Comprehensive guide to debouncing implementation
-- **[Debouncing Quick Reference](DEBOUNCING_QUICK_REFERENCE.md)** - Quick reference for developers
+### Authentication & Security
+- **[Session Management Guide](SESSION_MANAGEMENT_GUIDE.md)** - Complete session management docs
+- **[Session Management Quick Reference](SESSION_MANAGEMENT_QUICK_REFERENCE.md)** - Quick session reference
 - **[Login Authentication Guide](LOGIN_AUTHENTICATION_GUIDE.md)** - Complete authentication docs
 - **[Login Quick Reference](LOGIN_QUICK_REFERENCE.md)** - Quick login reference
+
+### Search & Performance
+- **[Elasticsearch Flow Guide](ELASTICSEARCH_FLOW_GUIDE.md)** - Elasticsearch-style search implementation
+- **[Debouncing Guide](DEBOUNCING_GUIDE.md)** - Comprehensive guide to debouncing
+- **[Debouncing Quick Reference](DEBOUNCING_QUICK_REFERENCE.md)** - Quick debouncing reference
+- **[Debouncing Visual Demo](DEBOUNCING_VISUAL_DEMO.md)** - Visual comparison and examples
+
+## 🚀 Key Features Highlights
+
+### 🔐 Session Management
+- **30-minute timeout** with activity tracking
+- **JWT token simulation** (header.payload.signature)
+- **Real-time session widget** (bottom-right corner)
+- **5-minute warning** before expiry
+- **One-click extension** to refresh session
+- **Auto-logout** on inactivity
+- **Tab-close clear** (sessionStorage)
+
+### 🔍 Elasticsearch-Style Search
+- **Partial matching**: "meet" finds "meeting", "teammate", "meetings"
+- **Relevance scoring**: Best matches ranked first
+- **Multi-field**: Searches title + description
+- **Case-insensitive**: Works with any case
+- **300ms debouncing**: 96% fewer operations
+- **Visual feedback**: "Searching..." indicator
+
+### ⚡ Performance Optimizations
+- Custom `useDebounce` hook
+- Activity-based session extension
+- Efficient filtering algorithms
+- Optimized re-rendering
+- Console logging for debugging
 
 ## License
 

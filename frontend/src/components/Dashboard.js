@@ -8,6 +8,7 @@ import TaskList from './TaskList';
 import TaskFilter from './TaskFilter';
 import Modal from './Modal';
 import Button from './Button';
+import SessionInfo from './SessionInfo';
 
 // API base URL
 const API_URL = 'http://localhost:5000/api/tasks';
@@ -333,6 +334,9 @@ const Dashboard = () => {
           <p>© 2025 Task Manager | Built with React & MongoDB</p>
         </div>
       </footer>
+
+      {/* Session Information Component */}
+      <SessionInfo />
     </div>
   );
 };
