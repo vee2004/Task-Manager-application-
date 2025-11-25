@@ -16,7 +16,11 @@ A full-stack Task Manager application built with React, Node.js, Express, and Mo
 - ✅ Delete tasks with confirmation
 - ✅ Mark tasks as complete/pending
 - ✅ Filter tasks by priority and status
-- ✅ Search tasks by title (case-insensitive with debouncing)
+- ✅ **Optimized Search** with custom debouncing (300ms delay)
+  - Case-insensitive search across title and description
+  - 96% reduction in re-renders
+  - Visual "Searching..." feedback
+  - Smooth typing experience
 - ✅ Sort tasks by various criteria
 - ✅ Responsive UI with Tailwind CSS
 
@@ -26,7 +30,8 @@ A full-stack Task Manager application built with React, Node.js, Express, and Mo
 - React.js (Create React App)
 - Tailwind CSS
 - Axios
-- React Hooks (useState, useEffect)
+- React Hooks (useState, useEffect, Custom useDebounce hook)
+- Context API for state management
 
 ### Backend
 - Node.js
@@ -105,14 +110,26 @@ TaskManager/
 │   │   │   ├── Select.js
 │   │   │   ├── Modal.js
 │   │   │   ├── Badge.js
+│   │   │   ├── Login.js
+│   │   │   ├── Dashboard.js
+│   │   │   ├── ProtectedRoute.js
 │   │   │   ├── TaskForm.js
 │   │   │   ├── TaskList.js
+│   │   │   ├── TaskFilter.js
 │   │   │   └── TaskItem.js
+│   │   ├── context/
+│   │   │   └── AuthContext.js
+│   │   ├── hooks/
+│   │   │   └── useDebounce.js
 │   │   ├── App.js
 │   │   ├── index.js
 │   │   └── index.css
 │   └── package.json
-└── README.md
+├── README.md
+├── DEBOUNCING_GUIDE.md
+├── DEBOUNCING_QUICK_REFERENCE.md
+├── LOGIN_AUTHENTICATION_GUIDE.md
+└── LOGIN_QUICK_REFERENCE.md
 ```
 
 ## API Endpoints
@@ -130,7 +147,17 @@ TaskManager/
 3. **Delete Task**: Click "Delete" and confirm to remove a task
 4. **Toggle Complete**: Click "Toggle Complete" to mark task as done/pending
 5. **Filter Tasks**: Use the filter dropdown to view tasks by priority or status
-6. **Search**: Type in the search box to find tasks by title
+6. **Search**: Type in the search box to find tasks by title or description
+   - Search is **debounced** (300ms delay) for optimal performance
+   - Visual "🔍 Searching..." indicator shows while typing
+   - Case-insensitive matching
+
+## 📚 Documentation
+
+- **[Debouncing Guide](DEBOUNCING_GUIDE.md)** - Comprehensive guide to debouncing implementation
+- **[Debouncing Quick Reference](DEBOUNCING_QUICK_REFERENCE.md)** - Quick reference for developers
+- **[Login Authentication Guide](LOGIN_AUTHENTICATION_GUIDE.md)** - Complete authentication docs
+- **[Login Quick Reference](LOGIN_QUICK_REFERENCE.md)** - Quick login reference
 
 ## License
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import useDebounce from '../hooks/useDebounce';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TaskFilter from './TaskFilter';
@@ -32,18 +33,13 @@ const Dashboard = () => {
     sort: 'dueDate-asc'
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-
+  
   /**
-   * Debounce search query to optimize performance
+   * Use custom debounce hook to optimize search performance
+   * Delays search execution by 300ms after user stops typing
+   * This prevents excessive re-renders and improves UX
    */
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300);
-    
-    return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   /**
    * Fetch all tasks from the API
