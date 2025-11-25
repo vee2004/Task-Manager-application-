@@ -4,13 +4,20 @@ A full-stack Task Manager application built with React, Node.js, Express, and Mo
 
 ## Features
 
+- ✅ **Authentication System**
+  - Login screen with email/password
+  - Session storage for maintaining login state
+  - Protected routes (dashboard requires authentication)
+  - Logout functionality
+  - Auto-redirect after login
 - ✅ Create tasks with title, description, priority, and due date
 - ✅ View all tasks with detailed information
 - ✅ Edit existing tasks
 - ✅ Delete tasks with confirmation
 - ✅ Mark tasks as complete/pending
 - ✅ Filter tasks by priority and status
-- ✅ Search tasks by title
+- ✅ Search tasks by title (case-insensitive with debouncing)
+- ✅ Sort tasks by various criteria
 - ✅ Responsive UI with Tailwind CSS
 
 ## Tech Stack
