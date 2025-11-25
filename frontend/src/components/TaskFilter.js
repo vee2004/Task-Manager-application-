@@ -78,13 +78,13 @@ const TaskFilter = ({ filters, onFilterChange, searchQuery, onSearchChange }) =>
   return (
     <div className="bg-white rounded-lg shadow-md p-5 mb-6">
       <h2 className="text-xl font-bold text-gray-800 mb-4">
-        🔍 Filter & Search
+        🔍 Elasticsearch-Style Search & Filter
       </h2>
 
       {/* Search Bar with Debouncing */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Search Tasks
+          🔎 Smart Search (Elasticsearch Flow)
           {isSearching && (
             <span className="ml-2 text-xs text-blue-600 animate-pulse">
               🔍 Searching...
@@ -96,7 +96,7 @@ const TaskFilter = ({ filters, onFilterChange, searchQuery, onSearchChange }) =>
             type="text"
             value={searchQuery}
             onChange={onSearchChange}
-            placeholder="Search tasks by title or description... (case-insensitive)"
+            placeholder="🚀 Try: 'meet', 'review', 'urgent'... (partial matching, case-insensitive)"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
           <svg
@@ -113,9 +113,24 @@ const TaskFilter = ({ filters, onFilterChange, searchQuery, onSearchChange }) =>
             />
           </svg>
         </div>
-        <p className="text-xs text-gray-500 mt-1">
-          💡 Search uses 300ms debouncing for optimal performance
-        </p>
+        <div className="flex items-center mt-2 space-x-2 text-xs text-gray-600">
+          <span className="flex items-center">
+            <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+            Partial substring matching
+          </span>
+          <span className="flex items-center">
+            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
+            Case-insensitive
+          </span>
+          <span className="flex items-center">
+            <span className="inline-block w-2 h-2 bg-purple-500 rounded-full mr-1"></span>
+            300ms debouncing
+          </span>
+          <span className="flex items-center">
+            <span className="inline-block w-2 h-2 bg-orange-500 rounded-full mr-1"></span>
+            Relevance scoring
+          </span>
+        </div>
       </div>
 
       {/* Filter Controls */}

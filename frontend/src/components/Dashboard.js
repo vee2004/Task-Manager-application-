@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import useDebounce from '../hooks/useDebounce';
+import { elasticSearch } from '../utils/elasticSearch';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TaskFilter from './TaskFilter';
@@ -66,35 +67,60 @@ const Dashboard = () => {
   }, []);
 
   /**
-   * Apply filters and search to tasks
+   * Apply filters and search to tasks using Elasticsearch-style search
+   * Flow: Input → Debounce → Elastic Search → Filter → Sort → Render
    */
   useEffect(() => {
+    console.log('🔍 Elasticsearch Flow Started');
+    console.time('Search & Filter Operation');
+    
     let result = [...tasks];
 
-    // Apply priority filter
+    // Step 1: Apply Elasticsearch-style search with debounced query
+    // Features: Partial substring matching, case-insensitive, relevance scoring
+    if (debouncedSearchQuery.trim()) {
+      console.log('📊 Elasticsearch Query:', debouncedSearchQuery);
+      
+      result = elasticSearch(result, debouncedSearchQuery, {
+        fields: ['title', 'description'], // Multi-field search
+        minScore: 0, // Include all matches
+        sortByRelevance: false, // We'll sort by user preference later
+        includeHighlights: true // Get highlighted matches
+      });
+      
+      console.log(`✅ Found ${result.length} matches with relevance scores`);
+      
+      // Log top matches with scores (for debugging)
+      if (result.length > 0) {
+        console.log('🏆 Top matches:');
+        result.slice(0, 3).forEach((task, idx) => {
+          console.log(`  ${idx + 1}. ${task.title} (Score: ${task._score.toFixed(2)})`);
+        });
+      }
+    }
+
+    // Step 2: Apply priority filter
     if (filters.priority !== 'All') {
       result = result.filter(task => task.priority === filters.priority);
+      console.log(`🔖 Priority filter applied: ${filters.priority} (${result.length} tasks)`);
     }
 
-    // Apply status filter
+    // Step 3: Apply status filter
     if (filters.status === 'Pending') {
       result = result.filter(task => !task.completed);
+      console.log(`📋 Status filter applied: Pending (${result.length} tasks)`);
     } else if (filters.status === 'Completed') {
       result = result.filter(task => task.completed);
+      console.log(`✅ Status filter applied: Completed (${result.length} tasks)`);
     }
 
-    // Apply case-insensitive search filter with debouncing
-    if (debouncedSearchQuery.trim()) {
-      const searchLower = debouncedSearchQuery.toLowerCase();
-      result = result.filter(task =>
-        task.title.toLowerCase().includes(searchLower) ||
-        (task.description && task.description.toLowerCase().includes(searchLower))
-      );
-    }
-
-    // Apply sorting
+    // Step 4: Apply sorting (user preference overrides relevance)
     result = sortTasks(result, filters.sort);
+    console.log(`🔢 Sorted by: ${filters.sort}`);
 
+    console.timeEnd('Search & Filter Operation');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     setFilteredTasks(result);
   }, [tasks, filters, debouncedSearchQuery]);
 
