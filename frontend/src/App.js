@@ -28,6 +28,20 @@ function App() {
     sort: 'dueDate-asc'
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  /**
+   * Debounce search query to optimize performance
+   * Waits 300ms after user stops typing before applying search
+   */
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms delay
+
+    // Cleanup function to clear timeout if searchQuery changes
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   /**
    * Fetch all tasks from the API
@@ -55,6 +69,7 @@ function App() {
 
   /**
    * Apply filters and search to tasks
+   * Uses debounced search query for better performance
    */
   useEffect(() => {
     let result = [...tasks];
@@ -71,10 +86,12 @@ function App() {
       result = result.filter(task => task.completed);
     }
 
-    // Apply search filter
-    if (searchQuery.trim()) {
+    // Apply case-insensitive search filter with debouncing
+    if (debouncedSearchQuery.trim()) {
+      const searchLower = debouncedSearchQuery.toLowerCase();
       result = result.filter(task =>
-        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+        task.title.toLowerCase().includes(searchLower) ||
+        (task.description && task.description.toLowerCase().includes(searchLower))
       );
     }
 
@@ -82,7 +99,7 @@ function App() {
     result = sortTasks(result, filters.sort);
 
     setFilteredTasks(result);
-  }, [tasks, filters, searchQuery]);
+  }, [tasks, filters, debouncedSearchQuery]);
 
   /**
    * Sort tasks based on selected criteria
